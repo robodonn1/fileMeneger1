@@ -1,8 +1,8 @@
 const express = require('express');
+const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 const { Sequelize, DataTypes } = require('sequelize');
-
 const app = express();
 
 const storageConfid = multer.diskStorage({
@@ -10,13 +10,14 @@ const storageConfid = multer.diskStorage({
         cb(null, "uploads");
     },
     filename: (req, file, cb) => {
-        console.log(file.originalname);
-        cb(null, file.originalname + ':' + new Date().getUTCDay());
+        cb(null, file.originalname) + '-' + Date.now();
     }
 })
 
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 app.use(multer({ dest: "uploads", storage: storageConfid }).single('filedata'));
+
 const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: 'database.sqlite'
@@ -28,8 +29,7 @@ const asdas = async () => {
         await sequelize.sync({ force: false });
         console.log('true');
     } catch (e) {
-        conso
-        le.log('false', e);
+        console.log('false', e);
     }
 }
 
@@ -38,6 +38,31 @@ const FilesData = sequelize.define('FileData',
         name: { type: DataTypes.STRING, allowNull: false }
     }
 )
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/dir', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index1.html'));
+});
+
+app.get('/files', (req, res) => {
+    fs.readdir('uploads/', (err, files) => {
+        if (err) return res.status(404).send('Ошибка');
+
+        let list = [];
+
+        files.forEach(file => {
+            const fileUrl = `/uploads/${file}`;
+            list.push({ name: file, url: fileUrl });
+        });
+
+        console.log(list);
+
+        res.json({ files: list });
+    });
+});
 
 app.post('/upload', async (req, res, next) => {
 
@@ -53,12 +78,9 @@ app.post('/upload', async (req, res, next) => {
         res.send("Ошибка при загрузке файла");
     else
         res.send("Файл загружен<button onclick='window.location.href=`/`'>Вернутся</button>");
-})
-
-app.get('/', (req, res) => {
-    res.send(path.join(__dirname, 'public', 'index.html'));
-})
+});
 
 app.listen(3000, async () => {
-    asdas();
+    await asdas();
+    console.log('http://localhost:3000')
 });

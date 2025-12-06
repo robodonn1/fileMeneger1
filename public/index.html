@@ -5,9 +5,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Загрузка файлов</title>
+
+    <style>
+        body{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            align-items: center;
+            gap: 30px;
+        }
+
+        a{
+            font-size: 48px;
+        }
+
+        form{
+            background-color: lightgray;
+            padding: 10px 20px;
+            border-radius: 16px;
+
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        form label{
+            font-size: 24px;
+        }
+
+        form input{
+            font-size: 24px;
+        }
+    </style>
 </head>
 
 <body>
+    <a href="/dir">Все файлы</a>
 
     <form action="/upload" method="post" enctype="multipart/form-data">
         <label for="">Файл</label><br>
